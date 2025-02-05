@@ -1,0 +1,30 @@
+import store from "../../store";
+import { getAcademicCareerValues } from "../../store/get/get-all-academic-career-slice";
+import { getAcademicProgramValues } from "../../store/get/get-all-academic-program-slice";
+import { getAdmitTypeValues } from "../../store/get/get-all-admit-type-slice";
+import { getCategoryValues } from "../../store/get/get-all-category-slice";
+import { getCityValues } from "../../store/get/get-all-city-slice";
+import { getStateValues } from "../../store/get/get-all-state-slice";
+import { getTwelfthBoardValues } from "../../store/get/get-all-twelfth-board-slice";
+import { getTwelfthMarkingSchemeValues } from "../../store/get/get-all-twelfthMarkingScheme-slice";
+import { getTwelfthResultStatusValues } from "../../store/get/get-all-twelfthResultStatus-slice";
+import { getUgResultStatusValues } from "../../store/get/get-all-ugResultStatus-slice";
+import { getTenthBoardValues } from "../../store/get/get-all10th-slice";
+import { getTenthMarkingSchemeValues } from "../../store/get/get-all10thScheme-slice";
+import { getLeadSourceValues } from "../../store/lead-capturing/get-allLeadSource-slice";
+
+export const dispatchAllApis = () => {
+  store.dispatch(getStateValues());
+  store.dispatch(getCategoryValues());
+  store.dispatch(getAdmitTypeValues());
+  store.dispatch(getTenthBoardValues());
+  store.dispatch(getLeadSourceValues());
+  store.dispatch(getTwelfthBoardValues());
+  store.dispatch(getAcademicCareerValues());
+  store.dispatch(getUgResultStatusValues());
+  store.dispatch(getTenthMarkingSchemeValues());
+  store.dispatch(getTwelfthResultStatusValues());
+  store.dispatch(getTwelfthMarkingSchemeValues());
+  store.dispatch(getCityValues());
+  store.dispatch(getAcademicProgramValues());
+};
