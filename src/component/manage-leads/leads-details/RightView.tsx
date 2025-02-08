@@ -14,7 +14,6 @@ import TopHeaderTabsActions from "./manage-lead-details-head/TopHeaderTabsAction
 import { getFeeCalculationByProgramId } from "../../../store/offer-analysis/get-FeeCalculation-byProgramId-slice";
 import { getStudentDocsByLeadCaptureId } from "../../../store/student-documets/get-studentDocs-byId-slice";
 
-
 const RightView: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -37,15 +36,14 @@ const RightView: React.FC = () => {
     const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true && findLeadScholarshipDetailsResponse.status !== "validated";
     setDisplayOfferAnalysis(shouldDisplayOfferAnalysis);
 
-    if (!shouldDisplayOfferAnalysis) {
-      setActiveTab(0);
-    }
+    // if (!shouldDisplayOfferAnalysis) {
+    //   setActiveTab(0);
+    // }
   }, [leadApplicationStatusByLeadId, findLeadScholarshipDetailsResponse.status]);
 
   const programId = leadAdditionalDetailsDataById?.academicProgramId;
   const leadCaptureId = leadAdditionalDetailsDataById.leadCaptureId;
 
- 
   useEffect(() => {
     store.dispatch(onGetRightSectionTabname(tabs[activeTab].label));
   }, [activeTab]);
@@ -67,8 +65,6 @@ const RightView: React.FC = () => {
       store.dispatch(getStudentDocsByLeadCaptureId(leadCaptureId));
     }
   };
-
-  
 
   // useEffect(() => {
   //   if (!shouldDisplayOfferAnalysis) {
