@@ -11,21 +11,20 @@ interface FeeDetail {
 }
 
 const FeeDetails: React.FC = () => {
-  const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
+  const { FeeDetailsV2Response } = useSelector((state: RootState) => state.getFeeDetailsV2);
   const { isLoading: isLoadingForLeadOfferDetails, leadOfferHistoryByOfferIdResponse } = useSelector((state: RootState) => state.leadOfferHistoryByOfferId);
 
   const [feeDetailsdata, setFeeDetailsData] = useState<FeeDetail[]>([]);
 
-
   useEffect(() => {
     let data: FeeDetail[] = [];
     if (!isLoadingForLeadOfferDetails && Object.keys(leadOfferHistoryByOfferIdResponse || {}).length === 0) {
-      data = transformApiResponse(FeeCalculationByProgramIdResponse) as FeeDetail[];
+      data = transformApiResponse(FeeDetailsV2Response) as FeeDetail[];
     } else {
       data = transformLeadHistoryFeeData(leadOfferHistoryByOfferIdResponse) as FeeDetail[];
     }
     setFeeDetailsData(data);
-  }, [isLoadingForLeadOfferDetails, FeeCalculationByProgramIdResponse, leadOfferHistoryByOfferIdResponse]);
+  }, [isLoadingForLeadOfferDetails, FeeDetailsV2Response, leadOfferHistoryByOfferIdResponse]);
 
   return (
     <div className="w-full">
@@ -39,7 +38,6 @@ const FeeDetails: React.FC = () => {
                 <div className={`flex justify-between w-full max-w-[110px] ${ele.title === "Total Course Fee" ? "font-semibold" : ""}`}>
                   <span>₹</span>
                   <p>{ele.value}</p>
-
                 </div>
               </div>
             </div>

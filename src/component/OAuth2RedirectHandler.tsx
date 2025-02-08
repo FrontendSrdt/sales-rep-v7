@@ -19,17 +19,17 @@ const OAuth2RedirectHandler = () => {
       params.append("grant_type", "authorization_code");
       params.append("code", code);
       //prod
-      // params.append("redirect_uri", "http://192.200.12.176:4047/login/oauth2/code/unifcrm");
-      params.append("redirect_uri", "http://10.8.20.38:4047/login/oauth2/code/unifcrm");
+      params.append("redirect_uri", "http://192.200.12.176:4047/login/oauth2/code/unifcrm");
+      // params.append("redirect_uri", "http://10.8.20.38:4047/login/oauth2/code/unifcrm");
 
       axios
         //prod
-        // .post("http://192.200.12.174:9001/oauth2/token", params, {
-        .post("http://10.8.20.38:9001/oauth2/token", params, {
+        .post("http://192.200.12.174:9001/oauth2/token", params, {
+        // .post("http://10.8.20.38:9001/oauth2/token", params, {
           auth: {
             //prod
-            // username: "unifcrmsales",
-            username: "unifcrmm",
+            username: "unifcrmsales",
+            // username: "unifcrmm",
             password: "secret",
           },
         })

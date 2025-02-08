@@ -12,9 +12,9 @@ const initialState: GetMaxLeadScholarshipDetailsIdType = {
   isLoading: false,
   isError: null,
 };
-export const findLeadScholarshipDetailsById = createAsyncThunk<any, string | undefined>("findLeadScholarshipDetailsdfdagsdg", async (leadCaptureId, { rejectWithValue }) => {
+export const findLeadScholarshipDetailsById = createAsyncThunk<any, any>("findLeadScholarshipDetailsdfdagsdg", async ({ leadCaptureId, leadEnquiryId }, { rejectWithValue }) => {
   try {
-    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadScholarshipDetails/findByLeadCaptureIdWithMaxCreatedAt/${leadCaptureId}`);
+    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadScholarshipDetails/findByLeadCaptureAndEnquiryId/${leadCaptureId}/${leadEnquiryId}`);
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data.message || "An error occurred.");

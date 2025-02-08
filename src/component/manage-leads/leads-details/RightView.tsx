@@ -14,6 +14,7 @@ import TopHeaderTabsActions from "./manage-lead-details-head/TopHeaderTabsAction
 import { getFeeCalculationByProgramId } from "../../../store/offer-analysis/get-FeeCalculation-byProgramId-slice";
 import { getStudentDocsByLeadCaptureId } from "../../../store/student-documets/get-studentDocs-byId-slice";
 
+
 const RightView: React.FC = () => {
   const [activeTab, setActiveTab] = useState(0);
 
@@ -44,6 +45,7 @@ const RightView: React.FC = () => {
   const programId = leadAdditionalDetailsDataById?.academicProgramId;
   const leadCaptureId = leadAdditionalDetailsDataById.leadCaptureId;
 
+ 
   useEffect(() => {
     store.dispatch(onGetRightSectionTabname(tabs[activeTab].label));
   }, [activeTab]);
@@ -65,6 +67,8 @@ const RightView: React.FC = () => {
       store.dispatch(getStudentDocsByLeadCaptureId(leadCaptureId));
     }
   };
+
+  
 
   // useEffect(() => {
   //   if (!shouldDisplayOfferAnalysis) {
@@ -135,14 +139,14 @@ const RightView: React.FC = () => {
             isLoadingForActivityHistory
               ? `Fetching Activity History !`
               : isLoadingForLeadDetails
-                ? "Fetching Lead Details !"
-                : isLoadingForTask
-                  ? "Fetching Task !"
-                  : isLoadingForNotes
-                    ? "Fetching Notes !"
-                    : isLoadingForDocs
-                      ? "Fetching Documents !"
-                      : ""
+              ? "Fetching Lead Details !"
+              : isLoadingForTask
+              ? "Fetching Task !"
+              : isLoadingForNotes
+              ? "Fetching Notes !"
+              : isLoadingForDocs
+              ? "Fetching Documents !"
+              : ""
           }
           centered={true}
         />

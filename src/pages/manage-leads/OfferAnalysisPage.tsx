@@ -10,6 +10,7 @@ import { leadOfferHistoryByOfferId, resetLeadOfferHistoryByOfferIdResponse } fro
 import LoadingSpinner from "../../util/custom/ui/LoadingSpinner";
 import { resetPackageDealByLeadCaptureIdResponse } from "../../store/package-deal/get-package-deal-by-programId-leadCaptureId-slice";
 import useForLocation from "../../hooks/useForLocation";
+import { getAllScholarshipOption } from "../../store/scholarship-get/get-all-scholarshipData-slice";
 
 const OfferAnalysisPage: React.FC = () => {
   const dispatch = store.dispatch;
@@ -20,9 +21,13 @@ const OfferAnalysisPage: React.FC = () => {
   const { isLoading } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
+  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
+  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
+  const leadEnquiryId = activeEnquiry[0].leadEnquiryId;
   const [offerId, setOfferId] = useState(null);
   const [leadStatus, setLeadStatus] = useState<string>("");
   const { currentURL } = useForLocation();
+  const { isRun: isrunForLockOffer } = useSelector((state: RootState) => state.lockLeadOffer);
 
   useEffect(() => {
     store.dispatch(resetLeadOfferHistoryByOfferIdResponse());
@@ -43,8 +48,13 @@ const OfferAnalysisPage: React.FC = () => {
     if (programId !== undefined && leadCaptureId !== undefined) {
       store.dispatch(getFeeCalculationByProgramId({ programId, leadCaptureId }));
     }
-    store.dispatch(getLeadOfferByLeadId(leadCaptureId));
-  }, [programId, leadCaptureId]);
+
+    const payload = {
+      leadCaptureId: leadCaptureId,
+      leadEnquiryId: leadEnquiryId,
+    };
+    store.dispatch(getLeadOfferByLeadId(payload));
+  }, [programId, leadCaptureId, isrunForLockOffer]);
 
   // function to dispatch the lead offer lock
   const handleLockOffer = () => {
@@ -82,7 +92,15 @@ const OfferAnalysisPage: React.FC = () => {
     if (offerId !== null) {
       store.dispatch(leadOfferHistoryByOfferId({ offerId, leadCaptureId }));
     }
-  }, [offerId, leadCaptureId]);
+    if (leadStatus !== "") {
+      const payload = {
+        leadCaptureId: leadCaptureId,
+        leadEnquiryId: leadEnquiryId,
+        status: leadStatus,
+      };
+      store.dispatch(getAllScholarshipOption(payload));
+    }
+  }, [leadStatus, offerId, leadCaptureId]);
 
   return (
     <div>
@@ -93,7 +111,6 @@ const OfferAnalysisPage: React.FC = () => {
         <OfferAnalysis
           handleLockOffer={handleLockOffer}
           ongetLeadOfferHistory={ongetLeadOfferHistory}
-          leadStatus={leadStatus}
           isEnablePackageDeal={isEnablePackageDeal}
           onEnableOfferGrantHandler={enableOfferGrantHandler}
         />

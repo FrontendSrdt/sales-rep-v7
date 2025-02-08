@@ -21,7 +21,7 @@ const initialState: LockLeadOfferType = {
 
 // Create Thunk to lock lead offer
 export const lockLeadOffer = createAsyncThunk<any | LockLeadOfferType, any>("offer/LockLeadOfferSlice", async (lockLeadOfferData, { rejectWithValue }) => {
-  const response = coreLeadCaptureApi.post("api/crm/lead/offerLocking/save", lockLeadOfferData);
+  const response = coreLeadCaptureApi.post("api/crm/lead/offerLocking/savev2", lockLeadOfferData);
 
   toast.promise(response, {
     loading: "Loading",

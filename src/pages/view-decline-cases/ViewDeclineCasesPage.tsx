@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import ViewDeclineCases from "../../component/view-decline-cases/ViewDeclineCases";
 import store, { RootState } from "../../store";
-import { getLeadWithDeclineOfferValues } from "../../store/lead-with-decline-offer/get-leadWithDeclineOffer-slice";
 import useForLocation from "../../hooks/useForLocation";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { getLeadCaptureByFullName } from "../../store/lead-capture/get-allLeadCapture-By-fullName-slice";
 
 const ViewDeclineCasesPage: React.FC = () => {
   const { isRun: isRunForReissueContract } = useSelector((state: RootState) => state.saveReissueContract);
@@ -12,10 +12,15 @@ const ViewDeclineCasesPage: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   // Dispatch the action to fetch the declined offer values
+  //   store.dispatch(getLeadWithDeclineOfferValues());
+  // }, [isRunForReissueContract]);
+
   useEffect(() => {
-    // Dispatch the action to fetch the declined offer values
-    store.dispatch(getLeadWithDeclineOfferValues());
-  }, [isRunForReissueContract]);
+   const payload = {leadOfferStatus: "declined"}
+   store.dispatch(getLeadCaptureByFullName(payload));
+  }, [isRunForReissueContract, currentURL]);
 
   useEffect(() => {
     const handlePopState = () => {

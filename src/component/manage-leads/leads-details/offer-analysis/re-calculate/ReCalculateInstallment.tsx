@@ -6,9 +6,7 @@ import { DatePicker } from "antd";
 import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { MdDelete, MdModeEditOutline } from "react-icons/md";
-import store, { RootState } from "../../../../../store";
-import { transformInstallmentTypePayload } from "../../../../../util/actions/transformInstallmentFormPayload";
-import { lockLeadOffer } from "../../../../../store/offer-details/lead-offer-lock-slice";
+import { RootState } from "../../../../../store";
 import ReCalculateFee from "./ReCalculateFee";
 
 type Installment = {
@@ -31,7 +29,6 @@ const validateInstallmentPayload = (payload: any) => {
 };
 
 const ReCalculateInstallment: React.FC = () => {
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   const { packageDealByLeadCaptureIdResponse } = useSelector((state: RootState) => state.packageDealByLeadCaptureId);
   const netFee = packageDealByLeadCaptureIdResponse?.courseFeeAfterDiscount;
@@ -44,7 +41,6 @@ const ReCalculateInstallment: React.FC = () => {
   const { leadCaptureId } = useParams();
 
   const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === false;
-  const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
 
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
@@ -165,7 +161,7 @@ const ReCalculateInstallment: React.FC = () => {
       installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
     }));
 
-    const finalInstallmentPayload = transformInstallmentTypePayload(packageDealByLeadCaptureIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
+    // const finalInstallmentPayload = transformInstallmentTypePayload(packageDealByLeadCaptureIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
 
     // Validate the payload
     const errors = validateInstallmentPayload(leadFeeInstallmentDetails);
@@ -176,8 +172,8 @@ const ReCalculateInstallment: React.FC = () => {
       return;
     }
     setValidationErrors([]);
-    console.log("finalInstallmentPayload==================", finalInstallmentPayload);
-    store.dispatch(lockLeadOffer(finalInstallmentPayload));
+    // console.log("finalInstallmentPayload==================", finalInstallmentPayload);
+    // store.dispatch(lockLeadOffer(finalInstallmentPayload));
     setTimeout(() => {
       setIsButtonDisabled(false);
     }, 2000);
@@ -237,7 +233,10 @@ const ReCalculateInstallment: React.FC = () => {
                         <td className="px-1 py-1 text-nowrap border h-[29px]">
                           {editingId === installment.id ? (
                             <div className="flex">
-                              <button className={`px-2 py-0.5    ${!tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"}`} onClick={handleOk}>
+                              <button
+                                className={`px-2 py-0.5    ${!tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"}`}
+                                onClick={handleOk}
+                              >
                                 <FaCheck size={18} />
                               </button>
                               <button className="px-2 py-0.5    text-red-500 border-red-500" onClick={handleCancel}>
@@ -249,9 +248,11 @@ const ReCalculateInstallment: React.FC = () => {
                               <button className="px-2 py-0.5    text-blue-500 border-blue-500" onClick={() => handleEditClick(installment.id)}>
                                 <MdModeEditOutline size={18} />
                               </button>
-                              {index !== 0 && <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
-                                <MdDelete size={18} />
-                              </button>}
+                              {index !== 0 && (
+                                <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
+                                  <MdDelete size={18} />
+                                </button>
+                              )}
                             </div>
                           ) : null}
                         </td>
@@ -260,7 +261,6 @@ const ReCalculateInstallment: React.FC = () => {
                   </tbody>
                 </table>
               </div>
-
             </div>
             {validationErrors.length > 0 && (
               <ul className=" text-red-600  px-3 pb-2">
@@ -273,12 +273,12 @@ const ReCalculateInstallment: React.FC = () => {
         </div>
       </div>
 
-
       <div className="flex justify-end pb-5 px-3">
         {shouldDisplayLockButton && (
           <button
             className={` ${shouldDisplayLockButton ? "bg-blue-600" : "bg-red-600"} text-white px-4 py-2 rounded bottom-[16px] right-[16px]`}
-            onClick={shouldDisplayLockButton ? handleLockOffer : undefined} disabled={isButtonDisabled}
+            onClick={shouldDisplayLockButton ? handleLockOffer : undefined}
+            disabled={isButtonDisabled}
           >
             Lock Offer
           </button>

@@ -283,3 +283,17 @@ li.active::after {
   padding: 0px 0px 0px !important;
   border: none !important;
 }
+
+.auto-grid-card {
+  margin-top: 30px;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 30px;
+}
+
+@media screen and (max-width: 592px) {
+  .auto-grid-card {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  }
+}

@@ -28,8 +28,8 @@ export const logoutUser = createAsyncThunk<any, LogoutPayload>("user/logout", as
   try {
     // there is not entercepter created for the below port therefor it's only one I have !!
     // prod
-    // await axios.get(`http://192.200.12.174:9001/logout/${email}`);
-    await axios.get(`http://10.8.20.38:9001/logout/${email}`);
+    await axios.get(`http://192.200.12.174:9001/logout/${email}`);
+    // await axios.get(`http://10.8.20.38:9001/logout/${email}`);
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     navigate("/"); // Navigate to the home page

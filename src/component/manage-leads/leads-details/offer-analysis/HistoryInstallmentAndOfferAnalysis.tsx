@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../../../../store";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { transformInstallmentTypePayload } from "../../../../util/actions/transformInstallmentFormPayload";
 import { DatePicker } from "antd";
 import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { MdDelete, MdModeEditOutline } from "react-icons/md";
 import FeeDetails from "./FeeDetails";
 import { lockLeadOffer } from "../../../../store/offer-details/lead-offer-lock-slice";
+import { transformHistoryInstallmentTypePayload } from "../../../../util/actions/transformHistoryInstallmentPayload";
 
 type Installment = {
   id: number;
@@ -30,7 +30,7 @@ const validateInstallmentPayload = (payload: any) => {
 };
 const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
   const { leadOfferHistoryByOfferIdResponse } = useSelector((state: RootState) => state.leadOfferHistoryByOfferId);
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
+  const { responseForAllScholarshipOptions } = useSelector((state: RootState) => state.getAllScholarshipOption);
   const netFee = leadOfferHistoryByOfferIdResponse?.netFee;
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee }]);
@@ -39,10 +39,39 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
   const [tempDate, setTempDate] = useState<string | null | any>(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const { leadCaptureId } = useParams();
-  const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
-
-  // Track the last selected date (for comparing the next date selection)
+  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
+  const [numberOfInstallment, setNumberOfInstallment] = useState<number>(0);
+  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
+  const leadEnquiryId = activeEnquiry.length > 0 ? activeEnquiry[0].leadEnquiryId : null;
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
+
+  console.log("leadOfferHistoryByOfferIdResponse.status", leadOfferHistoryByOfferIdResponse.status);
+
+  useEffect(() => {
+    if (numberOfInstallment > 0 && netFee > 0) {
+      const today = new Date();
+
+      const newInstallments = Array.from({ length: numberOfInstallment }, (_, index) => {
+        const dueDate = new Date(today);
+        dueDate.setDate(today.getDate() + (15 + index * 30)); // First installment in 15 days, next every 30 days
+
+        return {
+          id: index + 1,
+          dueDate: dueDate.toISOString().split("T")[0], // Format as 'YYYY-MM-DD'
+          amount: Math.floor(netFee / numberOfInstallment), // Evenly split
+        };
+      });
+
+      // Adjust the last installment to account for any rounding differences
+      const totalAssigned = newInstallments.reduce((sum, inst) => sum + inst.amount, 0);
+      const remainingAmount = netFee - totalAssigned;
+      newInstallments[newInstallments.length - 1].amount += remainingAmount;
+
+      setInstallments(newInstallments);
+    } else {
+      setInstallments([]); // Reset if numberOfInstallments is 0
+    }
+  }, [numberOfInstallment, netFee]);
 
   // Function to disable dates: previous dates and any previously selected dates
   const disabledDate = (current: any) => {
@@ -167,7 +196,13 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
       installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
     }));
 
-    const finalInstallmentPayload = transformInstallmentTypePayload(leadOfferHistoryByOfferIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
+    const finalInstallmentPayload = transformHistoryInstallmentTypePayload(
+      leadOfferHistoryByOfferIdResponse,
+      leadFeeInstallmentDetails,
+      leadCaptureId,
+      leadEnquiryId,
+      responseForAllScholarshipOptions
+    );
     // Validate the payload
     const errors = validateInstallmentPayload(leadFeeInstallmentDetails);
     if (errors.length > 0) {
@@ -178,7 +213,6 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
     setValidationErrors([]); // Clear errors if no validation issues
     console.log("finalInstallmentPayload= ", finalInstallmentPayload);
     store.dispatch(lockLeadOffer(finalInstallmentPayload));
-    // console.log(payload); // This is where you'd send the payload, e.g., an API call
     // store.dispatch(onGetLockAndOfferPayload(finalInstallmentPayload));
     setTimeout(() => {
       setIsButtonDisabled(false);
@@ -193,101 +227,139 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
         {/* Installment Section */}
         <div className="w-full mt-5 lg:mt-0 ">
           <h2 className="text-[20px] font-semibold text-[#3b82f6] mb-2">Installment Details</h2>
-          <div className="border h-[calc(100%-40px)]">
+
+          {leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails &&
+            leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails.length === 0 &&
+            leadOfferHistoryByOfferIdResponse.status === "submitted" && (
+              <div className="flex justify-evenly items-center">
+                <div className="flex gap-2">
+                  <input type="radio" name="numberOfInstallment" value={3} onChange={(e: any) => setNumberOfInstallment(e.target.value)} />
+                  <label htmlFor="numberOfInstallment">3 Installments </label>
+                </div>
+                <div className="flex gap-2">
+                  <input type="radio" name="numberOfInstallment" value={4} onChange={(e: any) => setNumberOfInstallment(e.target.value)} />
+                  <label htmlFor="numberOfInstallment">4 Installments </label>
+                </div>
+              </div>
+            )}
+
+          <div className="h-[calc(100%-40px)]">
             <div className="w-full px-3 py-3">
               <div className="w-full overflow-x-auto ">
                 <table className="text-sm" border={1} style={{ width: "100%", textAlign: "left" }}>
-                  <thead>
+                  {/* <thead>
                     <tr className="w-full">
-                      <th className="w-[25%] min-w-[135px]   border px-1 py-1.5 text-nowrap">Installment Number</th>
-                      <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Due Date</th>
-                      <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
+                      <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Installment Number</th>
+                      <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Due Date</th>
+                      <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
                       {leadOfferHistoryByOfferIdResponse.status === "submitted" && <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Actions</th>}
                     </tr>
-                  </thead>
+                  </thead> */}
 
                   {/* form to give installment to student in case of status submitted */}
                   {leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails &&
                     leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails.length === 0 &&
                     leadOfferHistoryByOfferIdResponse.status === "submitted" && (
-                      <tbody>
-                        {installments.map((installment, index) => (
-                          <tr key={installment.id}>
-                            <td className="px-1 py-1 text-nowrap border h-[29px]">{installment.id}</td>
-                            <td className="px-1 py-1 text-nowrap border h-[29px]">
-                              {installment.dueDate === "" ? (
-                                <DatePicker
-                                  value={tempDate ? dayjs(tempDate) : null}
-                                  onChange={(_, dateString) => setTempDate(dateString)}
-                                  disabledDate={disabledDate}
-                                  disabled={editingId !== installment.id}
-                                  style={{ width: "100%" }}
-                                  className="border-remove-date-picker"
-                                />
-                              ) : (
-                                installment.dueDate
-                              )}
-                            </td>
-                            <td className="px-1 py-1 text-nowrap border h-[29px]">
-                              {editingId === installment.id ? (
-                                <input
-                                  type="text"
-                                  className="w-full max-w-[95%] focus:outline-none"
-                                  value={tempAmount || ""}
-                                  onChange={(e) => setTempAmount(parseInt(e.target.value) || 0)}
-                                />
-                              ) : (
-                                installment.amount
-                              )}
-                            </td>
-                            <td className="px-1 py-1 text-nowrap border h-[29px]">
-                              {editingId === installment.id ? (
-                                <div className="flex">
-                                  <button
-                                    className={`px-2 py-0.5    ${
-                                      !tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"
-                                    }`}
-                                    onClick={handleOk}
-                                  >
-                                    <FaCheck size={18} />
-                                  </button>
-                                  <button className="px-2 py-0.5    text-red-500 border-red-500" onClick={handleCancel}>
-                                    <RxCross2 size={18} />
-                                  </button>
-                                </div>
-                              ) : index === installments.length - 1 ? (
-                                <div className="flex">
-                                  <button className="px-2 py-0.5    text-blue-500 border-blue-500" onClick={() => handleEditClick(installment.id)}>
-                                    <MdModeEditOutline size={18} />
-                                  </button>
-                                  {index !== 0 && (
-                                    <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
-                                      <MdDelete size={18} />
-                                    </button>
-                                  )}
-                                </div>
-                              ) : null}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
+                      <>
+                        {numberOfInstallment !== 0 && (
+                          <>
+                            <thead>
+                              <tr className="w-full">
+                                <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Installment Number</th>
+                                <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Due Date</th>
+                                <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
+                                {leadOfferHistoryByOfferIdResponse.status === "submitted" && <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Actions</th>}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {installments.map((installment, index) => (
+                                <tr key={installment.id}>
+                                  <td className="px-1 py-1 text-nowrap border h-[29px]">{installment.id}</td>
+                                  <td className="px-1 py-1 text-nowrap border h-[29px]">
+                                    {installment.dueDate === "" ? (
+                                      <DatePicker
+                                        value={tempDate ? dayjs(tempDate) : null}
+                                        onChange={(_, dateString) => setTempDate(dateString)}
+                                        disabledDate={disabledDate}
+                                        disabled={editingId !== installment.id}
+                                        style={{ width: "100%" }}
+                                        className="border-remove-date-picker"
+                                      />
+                                    ) : (
+                                      installment.dueDate
+                                    )}
+                                  </td>
+                                  <td className="px-1 py-1 text-nowrap border h-[29px]">
+                                    {editingId === installment.id ? (
+                                      <input
+                                        type="text"
+                                        className="w-full max-w-[95%] focus:outline-none"
+                                        value={tempAmount || ""}
+                                        onChange={(e) => setTempAmount(parseInt(e.target.value) || 0)}
+                                      />
+                                    ) : (
+                                      installment.amount
+                                    )}
+                                  </td>
+                                  <td className="px-1 py-1 text-nowrap border h-[29px]">
+                                    {editingId === installment.id ? (
+                                      <div className="flex">
+                                        <button
+                                          className={`px-2 py-0.5    ${
+                                            !tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"
+                                          }`}
+                                          onClick={handleOk}
+                                        >
+                                          <FaCheck size={18} />
+                                        </button>
+                                        <button className="px-2 py-0.5    text-red-500 border-red-500" onClick={handleCancel}>
+                                          <RxCross2 size={18} />
+                                        </button>
+                                      </div>
+                                    ) : index === installments.length - 1 ? (
+                                      <div className="flex">
+                                        <button className="px-2 py-0.5    text-blue-500 border-blue-500" onClick={() => handleEditClick(installment.id)}>
+                                          <MdModeEditOutline size={18} />
+                                        </button>
+                                        {index !== 0 && (
+                                          <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
+                                            <MdDelete size={18} />
+                                          </button>
+                                        )}
+                                      </div>
+                                    ) : null}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </>
+                        )}
+                      </>
                     )}
 
                   {/* show the existing installment in case of status re-issues, accept and declined */}
                   {leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails &&
                     leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails.length !== 0 &&
-                    (leadOfferHistoryByOfferIdResponse.status === "re-issued" ||
-                      leadOfferHistoryByOfferIdResponse.status === "accept" ||
-                      leadOfferHistoryByOfferIdResponse.status === "declined") && (
-                      <tbody>
-                        {leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails.map((item: any) => (
-                          <tr key={item.leadFeeInstallmentDetailsId}>
-                            <td className="px-1 py-1 text-nowrap border">{item.installmentSeq}</td>
-                            <td className="px-1 py-1 text-nowrap border">{new Date(item.installmentDueDate).toLocaleDateString()}</td>
-                            <td className="px-1 py-1 text-nowrap border">{item.installmentAmount.toFixed(2)}</td>
+                    leadOfferHistoryByOfferIdResponse.status !== "submitted" && (
+                      <>
+                        <thead>
+                          <tr className="w-full">
+                            <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Installment Number</th>
+                            <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Due Date</th>
+                            <th className="w-[25%] min-w-[135px] border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
+                            {leadOfferHistoryByOfferIdResponse.status === "submitted" && <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Actions</th>}
                           </tr>
-                        ))}
-                      </tbody>
+                        </thead>
+                        <tbody>
+                          {leadOfferHistoryByOfferIdResponse.leadFeeInstallmentDetails.map((item: any) => (
+                            <tr key={item.leadFeeInstallmentDetailsId}>
+                              <td className="px-1 py-1 text-nowrap border">{item.installmentSeq}</td>
+                              <td className="px-1 py-1 text-nowrap border">{new Date(item.installmentDueDate).toLocaleDateString()}</td>
+                              <td className="px-1 py-1 text-nowrap border">{item.installmentAmount.toFixed(2)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </>
                     )}
                 </table>
               </div>
@@ -303,7 +375,7 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
         </div>
       </div>
       <div className="flex justify-end pb-5 px-5">
-        {leadOfferHistoryByOfferIdResponse.status === "submitted" && (
+        {leadOfferHistoryByOfferIdResponse.status === "submitted" && numberOfInstallment !== 0 && (
           <button className={`bg-blue-600 text-white px-4 py-2 rounded bottom-[16px] right-[16px]`} onClick={handleLockOffer} disabled={isButtonDisabled}>
             Lock Offer
           </button>

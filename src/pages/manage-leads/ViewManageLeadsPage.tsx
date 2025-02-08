@@ -20,6 +20,7 @@ import { findLeadScholarshipDetailsById } from "../../store/scholarship-services
 import { getLeadApplicationStatusByLeadId } from "../../store/lead-applicationStatus/get-lead-application-status-by-lead-capture-id-slice";
 import { getMaxActiveAppStatus } from "../../store/scholarship-services/get-max-active-application-status-slice";
 import { getStudentDocsByLeadCaptureId } from "../../store/student-documets/get-studentDocs-byId-slice";
+import { getLeadEnquiryDetailsById } from "../../store/lead-attribute-update/get-leadEnquiryDetails-slice";
 
 const ViewManageLeadsPage: React.FC = () => {
   const { leadCaptureId } = useParams();
@@ -41,9 +42,15 @@ const ViewManageLeadsPage: React.FC = () => {
   const { isRun: isRunForVerify } = useSelector((state: RootState) => state.verifyStudentDocsResponse);
   const { isRun: isRunForAllDocsConfirmation } = useSelector((state: RootState) => state.getConfirmationForAllDocsByLeadCaptureId);
 
+  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
+  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
 
   const navigate = useNavigate();
   const isViaButton = location.state?.viaButton;
+
+  useEffect(() => {
+    store.dispatch(getLeadEnquiryDetailsById(leadCaptureId));
+  }, [leadCaptureId]);
 
   useEffect(() => {
     if (!isViaButton) {
@@ -67,10 +74,18 @@ const ViewManageLeadsPage: React.FC = () => {
     }
   }, [leadCaptureId, dispatch]);
 
+  // ###################
   useEffect(() => {
-    dispatch(findLeadScholarshipDetailsById(leadCaptureId));
+    if (activeEnquiry.length !== 0) {
+      const leadEnquiryId = activeEnquiry[0].leadEnquiryId;
+      const payloadForScholarship = {
+        leadCaptureId: leadCaptureId,
+        leadEnquiryId: leadEnquiryId,
+      };
+      dispatch(findLeadScholarshipDetailsById(payloadForScholarship));
+    }
     dispatch(getLeadApplicationStatusByLeadId(leadCaptureId));
-  }, [leadCaptureId, isRunForLeadOfferLock, isRunForAllDocsConfirmation]);
+  }, [leadCaptureId, isRunForLeadOfferLock, isRunForAllDocsConfirmation, responseOfLeadEnquiryDetailsById]);
 
   useEffect(() => {
     dispatch(getStudentDocsByLeadCaptureId(leadCaptureId));
@@ -99,7 +114,6 @@ const ViewManageLeadsPage: React.FC = () => {
 
   // Consolidated loading and data availability checks
   const isLoading = isLoadingDetails && isLoadingProperties;
-
 
   return (
     <>

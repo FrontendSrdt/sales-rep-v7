@@ -1,7 +1,14 @@
 import { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import store, { RootState } from "../../../../store";
-import { onDisableModalForTestAction, onShowModalForQuickAddLeadForm, onShowModalForTestAction, uiSliceAction } from "../../../../store/ui/ui-slice";
+import {
+  onDisableModalForChangeStage,
+  onDisableModalForTestAction,
+  onSetOpenModalForChangeStage,
+  onShowModalForQuickAddLeadForm,
+  onShowModalForTestAction,
+  uiSliceAction,
+} from "../../../../store/ui/ui-slice";
 import useClickOutside from "../../../../hooks/useClickOutside";
 import { Link } from "react-router-dom";
 import QuickAddLeadForm from "../../genral/QuickAddLeadForm";
@@ -9,7 +16,11 @@ import CustomModal from "../../../../util/custom/ui/CustomModal";
 import { quickAddLeadFormData, testActionData } from "../../../../data/manage-leads/quick-add-form-data";
 import { Tooltip } from "react-tooltip";
 import { resetResposneforLeadCaptureByQuickAddForm } from "../../../../store/lead-capture/create-lead-capture-byQuickAddForm-slice";
-import TestAction from "../../genral/TestAction";
+import BulkChangeOwner from "../../genral/BulkChangeOwner";
+import { exportLead } from "../../../../store/actions/export-lead-slice";
+import toast from "react-hot-toast";
+import { changeStageData } from "../../../../data/change-stage-data";
+import ChangeStage from "../../genral/ChangeStage";
 
 interface SectionHeadPropsType {
   sectionHeadData: any;
@@ -39,9 +50,11 @@ const SectionHead: React.FC<SectionHeadPropsType> = ({ sectionHeadData }) => {
   const closeSubDataHandelr = () => dispatch(uiSliceAction.onDisabledSubData());
   const closeModal = () => dispatch(uiSliceAction.onDisableModalForQuickAddLeadForm());
   const closeModalForTestAction = () => dispatch(onDisableModalForTestAction());
-  const { isQuickAddFormModalOpen, isShowModalForTestAction } = useSelector((state: RootState) => state.ui);
+  const closeModalForChangeStage = () => dispatch(onDisableModalForChangeStage());
+  const { isQuickAddFormModalOpen, isShowModalForTestAction, isShowModalForChangeStage } = useSelector((state: RootState) => state.ui);
 
   useClickOutside([settingRef, subDataRef], [closeSettingDataHandler, closeSubDataHandelr]);
+  const { getAllCheckSelectedDataFormCustomTable } = useSelector((state: RootState) => state.ui);
 
   // console.log("isQuickAddFormModalOpen =", isQuickAddFormModalOpen);
   // console.log("selectedItem=============", selectedItem);
@@ -67,10 +80,12 @@ const SectionHead: React.FC<SectionHeadPropsType> = ({ sectionHeadData }) => {
       store.dispatch(resetResposneforLeadCaptureByQuickAddForm());
     }
 
-    if (id === 5) {
-      store.dispatch(onShowModalForTestAction());
-    }
+    // if (id === 5) {
+    //   store.dispatch(onShowModalForTestAction());
+    // }
   };
+
+  console.log("isShowModalForChangeStage", isShowModalForChangeStage);
 
   useClickOutside([dropDownRef], [closeDropDown]);
   return (
@@ -116,20 +131,54 @@ const SectionHead: React.FC<SectionHeadPropsType> = ({ sectionHeadData }) => {
                 {sectionHeadSelectData.map((item: any) => (
                   <li
                     key={item.id}
-                    className={`p-2 cursor-pointer hover:bg-gray-100 ${item.id === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
+                    className={`py-2 cursor-pointer hover:bg-gray-100 ${item.id === 1 ? "opacity-50 cursor-not-allowed" : ""}`}
                     onClick={() => handleItemClick(item)}
                   >
                     {item.path ? (
-                      <div className="flex gap-x-2">
+                      <div className="flex gap-x-2 px-2">
                         <div>{item.icon}</div>
                         <Link to={item.path} className="block w-full text-left">
                           {item.name}
                         </Link>
                       </div>
                     ) : (
-                      <div className="flex gap-x-2 items-center ">
+                      <div className="flex gap-x-2 items-center group relative px-2">
                         <span>{item.icon}</span>
+
                         <span onClick={handleModal.bind({}, item.id)}>{item.name}</span>
+                        <div className="hidden group-hover:block absolute hover:bg-gray-100 right-[100%] -top-[8px] min-w-[200px] pr-2">
+                          <div className={`rounded-md shadow-lg bg-white`}>
+                            {item.subMenu &&
+                              item.subMenu.map((ele: any) => (
+                                <div
+                                  className="flex items-center gap-2 p-2 hover:bg-gray-100"
+                                  key={ele.id}
+                                  onClick={() => {
+                                    if (ele.id === 2) {
+                                      store.dispatch(onShowModalForTestAction());
+                                    }
+
+                                    if (ele.id === 1) {
+                                      if (getAllCheckSelectedDataFormCustomTable && getAllCheckSelectedDataFormCustomTable.length === 0) {
+                                        toast.error("Please select at least one lead");
+                                        return; // Stop execution
+                                      }
+                                      store.dispatch(exportLead(getAllCheckSelectedDataFormCustomTable));
+                                    }
+
+                                    if (ele.id === 3) {
+                                      dispatch(onSetOpenModalForChangeStage());
+                                    }
+                                  }}
+                                >
+                                  <div>{ele.icon}</div>
+                                  <Link to={item.path} className="block w-full text-left  cursor-pointer">
+                                    {ele.name}
+                                  </Link>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
                       </div>
                     )}
                   </li>
@@ -196,7 +245,12 @@ const SectionHead: React.FC<SectionHeadPropsType> = ({ sectionHeadData }) => {
 
       {isShowModalForTestAction && (
         <CustomModal isMode="testAction" isShowModal={isShowModalForTestAction} onHideModal={closeModalForTestAction} data={testActionData}>
-          <TestAction />
+          <BulkChangeOwner onHideModal={closeModalForTestAction} />
+        </CustomModal>
+      )}
+      {isShowModalForChangeStage && (
+        <CustomModal isMode="testAction" isShowModal={isShowModalForChangeStage} onHideModal={closeModalForChangeStage} data={changeStageData}>
+          <ChangeStage onHideModal={closeModalForChangeStage} />
         </CustomModal>
       )}
     </div>

@@ -29,30 +29,35 @@ export function transformApiResponse(response: any) {
     {
       id: 6,
       title: "Additional Discount",
-      value: response.additionalDiscount,
+      value: response.additionalDiscount === null ? 0 : response.additionalDiscount,
     },
     {
       id: 7,
+      title: "Special Discount",
+      value: response.specialDiscount,
+    },
+    {
+      id: 8,
       title: "Total Previous Discount",
       value: response.totalDiscount - response.applicableDiscount - response.additionalDiscount,
     },
     {
-      id: 8,
+      id: 9,
       title: "Total Discount",
       value: response.totalDiscount,
     },
     {
-      id: 9,
+      id: 10,
       title: "Fee Payable After Discount",
       value: response.totalCourseFee - response.totalDiscount,
     },
     {
-      id: 10,
+      id: 11,
       title: "Adjusted Fee (Registration)",
       value: response.registrationAmount,
     },
     {
-      id: 11,
+      id: 12,
       title: "Net Fee",
       value: response.courseFeeAfterDiscount,
     },

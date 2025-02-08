@@ -12,9 +12,9 @@ const initialState: getLeadOfferByLeadIdType = {
   isLoading: true,
   isError: null,
 };
-export const getLeadOfferByLeadId = createAsyncThunk<any, any>("getLeadOfferByLeadId", async (leadCaptureId, { rejectWithValue }) => {
+export const getLeadOfferByLeadId = createAsyncThunk<any, any>("getLeadOfferByLeadId", async ({ leadCaptureId, leadEnquiryId }, { rejectWithValue }) => {
   try {
-    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadOffer/findByLeadCapture/${leadCaptureId}`);
+    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadOffer/findByLeadCapture/${leadCaptureId}/${leadEnquiryId}`);
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data.message || "An error occurred.");

@@ -5,7 +5,6 @@ import { capitalizeName } from "../manage-leads/genral/CapitalizeName";
 import { Link } from "react-router-dom";
 import { FaRegEye } from "react-icons/fa6";
 
-
 export const ViewDeclineCasesColumn: Column<declineLeadCases>[] = [
   // {
   //   Header: "Lead Capture Id",
@@ -29,18 +28,18 @@ export const ViewDeclineCasesColumn: Column<declineLeadCases>[] = [
   },
   {
     Header: "Academic Career",
-    accessor: "careerName",
-    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.careerName}</span>,
+    accessor: "academic_career_description",
+    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.academic_career_description}</span>,
   },
   {
     Header: "Academic Program",
-    accessor: "programName",
-    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.programName}</span>,
+    accessor: "academic_program_description",
+    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.academic_program_description}</span>,
   },
   {
     Header: "Lead Sub Stage",
-    accessor: "leadSubStageDescription",
-    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.leadSubStageDescription}</span>,
+    accessor: "current_lead_sub_stage_display_name",
+    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.current_lead_sub_stage_display_name}</span>,
   },
   {
     Header: "Modified On",
@@ -60,7 +59,7 @@ export const ViewDeclineCasesColumn: Column<declineLeadCases>[] = [
     },
   },
   {
-    Header:"Created At",
+    Header: "Created At",
     accessor: (row) => {
       const { dateFormatted, timeFormatted } = extractDateTime(row.createdAt);
       return `${dateFormatted} ${timeFormatted}`; // Preprocess for sorting/filtering
@@ -78,19 +77,20 @@ export const ViewDeclineCasesColumn: Column<declineLeadCases>[] = [
   },
   {
     Header: "Lead Source",
-    accessor: (row) => capitalizeName(row.leadSourceName),
-    Cell: ({ value }: { value: string }) => <span>{value}</span>,
+    accessor: (row) => capitalizeName(row.lead_source_description),
+    Cell: ({ row }: { row: { original: declineLeadCases } }) => <span>{row.original.lead_source_description}</span>,
+    // Cell: ({ value }: { value: string }) => <span>{row.original.lead_source_description}</span>,
   },
-  {
-    Header: "Lead Owner",
-    accessor: (row) => capitalizeName(row.leadOwner),
-    Cell: ({ value }: { value: string }) => <span>{value}</span>,
-  },
-  {
-    Header: "Status",
-    accessor: (row) => capitalizeName(row.status),
-    Cell: ({ value }: { value: string }) => <span>{value}</span>,
-  },
+  // {
+  //   Header: "Lead Owner",
+  //   accessor: (row) => capitalizeName(row.leadOwner),
+  //   Cell: ({ value }: { value: string }) => <span>{value}</span>,
+  // },
+  // {
+  //   Header: "Status",
+  //   accessor: (row) => capitalizeName(row.status),
+  //   Cell: ({ value }: { value: string }) => <span>{value}</span>,
+  // },
   {
     Header: "Action",
     Cell: ({ row }: { row: { original: declineLeadCases } }) => (

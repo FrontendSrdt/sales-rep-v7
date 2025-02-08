@@ -25,6 +25,7 @@ interface TableInstanceWithPlugins<T extends object> extends TableInstance<T> {
   prepareRow: any;
   state: any;
   selectedRowIds: any;
+  selectedFlatRows: any;
 }
 
 interface TableStateWithFiltersAndPagination<T extends object> extends TableState<T> {
@@ -77,7 +78,8 @@ export function CustomDetailsTable<T extends object>({ columns, data, onRowClick
     canPreviousPage,
     canNextPage,
     pageCount,
-    state: { selectedRowIds: selectedRows },
+    selectedFlatRows,
+    // state: { selectedRowIds: selectedRows },
   } = useTable<T>(
     {
       columns,
@@ -164,10 +166,10 @@ export function CustomDetailsTable<T extends object>({ columns, data, onRowClick
 
   // this is using to capture all leads data on clicking the checkbox
   useEffect(() => {
-    const selectedData = page.filter((row) => selectedRows[row.id]).map((row) => row.original);
-    // console.log("Selected Data:", selectedData);
+    const selectedData = selectedFlatRows.map((row: any) => row.original);
+    console.log("Selected Data Across Pages:", selectedData);
     store.dispatch(onGetAllCheckSelectedDataFormCustomTable(selectedData));
-  }, [selectedRows, page]);
+  }, [selectedFlatRows]);
 
   return (
     <>

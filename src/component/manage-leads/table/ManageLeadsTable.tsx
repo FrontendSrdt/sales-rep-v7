@@ -64,6 +64,7 @@ const ManageLeadsTable: React.FC<LeadsDataType> = ({ dataForTable }) => {
     <div>
       <div className="my-4 mx-3 sm:mx-5 px-3 py-3 sm:px-6 sm:py-6 shadow-md rounded-md bg-white">
         <div className="overflow-x-auto">
+          
           <SectionHead sectionHeadData={sectionHeadData} />
           <div className="relative -mt-8 top-8 pb-5">
             <TableHead />

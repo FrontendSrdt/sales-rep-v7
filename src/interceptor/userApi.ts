@@ -5,8 +5,8 @@ import { redirectToLogin, setAuth } from "../store/auth/auth-Slice";
 // Create an Axios instance
 const userApi = axios.create({
   // prod
-  // baseURL: "http://192.200.12.174:7071",
-  baseURL: "http://10.8.20.38:7071",
+  baseURL: "http://192.200.12.174:7071",
+  // baseURL: "http://10.8.20.38:7071",
 
   timeout: 20000,
 });
@@ -65,13 +65,13 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     params.append("grant_type", "refresh_token");
     params.append("refresh_token", refreshToken);
     // prod
-    //  const response = await axios.post("http://192.200.12.174:9001/oauth2/token", params.toString(), {
-    const response = await axios.post("http://10.8.20.38:9001/oauth2/token", params.toString(), {
+     const response = await axios.post("http://192.200.12.174:9001/oauth2/token", params.toString(), {
+    // const response = await axios.post("http://10.8.20.38:9001/oauth2/token", params.toString(), {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         // prod
-        //  Authorization: "Basic " + btoa("unifcrmsales:secret"),
-        Authorization: "Basic " + btoa("unifcrmm:secret"),
+         Authorization: "Basic " + btoa("unifcrmsales:secret"),
+        // Authorization: "Basic " + btoa("unifcrmm:secret"),
       },
     });
     store.dispatch(setAuth());

@@ -12,8 +12,9 @@ const initialState: LeadEnquiryDetailsIdType = {
   isLoading: true,
   isError: null,
 };
-export const getLeadEnquiryDetailsById = createAsyncThunk<any, number | any>("LeadEnquiryDetailsId", async (leadCaptureId, { rejectWithValue }) => {
+export const getLeadEnquiryDetailsById = createAsyncThunk<any, number | any>("LeadEnquiryyyyDetailsId", async (leadCaptureId, { rejectWithValue }) => {
   try {
+    console.log(leadCaptureId);
     const response = await coreLeadCaptureApi.get(`api/crm/lead/leadEnquiry/findByLeadCapture/${leadCaptureId}`);
     return response.data;
   } catch (error: any) {

@@ -1,5 +1,7 @@
+import { BsGraphUpArrow } from "react-icons/bs";
+import { FaUserEdit } from "react-icons/fa";
 import { FaUserPlus } from "react-icons/fa6";
-import { RiImportFill } from "react-icons/ri";
+import { RiExportFill, RiImportFill, RiUserSettingsFill } from "react-icons/ri";
 
 export const sectionHeadData = [
   {
@@ -23,9 +25,29 @@ export const sectionHeadData = [
       },
       {
         id: 5,
-        icon: <RiImportFill />,
+        icon: <RiUserSettingsFill />,
 
-        name: "Test Action",
+        name: "Actions",
+        subMenu: [
+          {
+            id: 1,
+            icon: <RiExportFill />,
+
+            name: "Export Lead",
+          },
+          {
+            id: 2,
+            icon: <FaUserEdit />,
+
+            name: "Change Owner",
+          },
+          {
+            id: 3,
+            icon: <BsGraphUpArrow />,
+
+            name: "Change Stage",
+          },
+        ],
       },
     ],
 

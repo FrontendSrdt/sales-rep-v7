@@ -55,6 +55,9 @@ interface typeUI {
   isShowModalForTestAction: boolean;
   isHamburgerModalOpen: boolean;
   selectedColumnToDisplay: Array<object>;
+  isDialogOpenForScolarship: boolean;
+  scholarshipData: {};
+  isShowModalForChangeStage: boolean;
 }
 
 const initialState: typeUI = {
@@ -123,6 +126,9 @@ const initialState: typeUI = {
     { id: 5, name: "academic_career_description", label: "Academic Career" },
     { id: 6, name: "academic_program_description", label: "Academic Program" },
   ],
+  isDialogOpenForScolarship: false,
+  scholarshipData: {},
+  isShowModalForChangeStage: false,
 };
 
 const uiSlice = createSlice({
@@ -418,6 +424,23 @@ const uiSlice = createSlice({
     onsetSelectedColumnToDisplay: (state, action) => {
       state.selectedColumnToDisplay = action.payload;
     },
+    onSetOpenDialogForScolarship: (state) => {
+      state.isDialogOpenForScolarship = true;
+    },
+    onSetCloseDialogForScolarship: (state) => {
+      state.isDialogOpenForScolarship = false;
+    },
+    onSetScholarshipData: (state, action) => {
+      state.scholarshipData = action.payload;
+    },
+
+    onSetOpenModalForChangeStage: (state) => {
+      state.isShowModalForChangeStage = true;
+    },
+
+    onDisableModalForChangeStage: (state) => {
+      state.isShowModalForChangeStage = false;
+    },
   },
 });
 
@@ -474,6 +497,11 @@ export const {
   onShowModalForHamburger,
   onDisableModalForHamburger,
   onsetSelectedColumnToDisplay,
+  onSetOpenDialogForScolarship,
+  onSetCloseDialogForScolarship,
+  onSetScholarshipData,
+  onDisableModalForChangeStage,
+  onSetOpenModalForChangeStage,
 } = uiSlice.actions;
 
 export const uiSliceAction = uiSlice.actions;

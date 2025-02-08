@@ -4,10 +4,10 @@ import { RootState } from "../../../store";
 
 const TestAction: React.FC = () => {
   const { getAllCheckSelectedDataFormCustomTable } = useSelector((state: RootState) => state.ui);
+  console.log(getAllCheckSelectedDataFormCustomTable);
 
   return (
     <div>
-    
       <table className="w-full border-collapse bg-white">
         <thead>
           <tr>
@@ -18,7 +18,7 @@ const TestAction: React.FC = () => {
           </tr>
         </thead>
         <tbody>
-          {getAllCheckSelectedDataFormCustomTable?.map((row:any, index) => (
+          {getAllCheckSelectedDataFormCustomTable?.map((row: any, index) => (
             <tr key={index} className="hover:bg-gray-100">
               <td className="border p-2">{row.leadCaptureId}</td>
               <td className="border p-2">{row.name}</td>

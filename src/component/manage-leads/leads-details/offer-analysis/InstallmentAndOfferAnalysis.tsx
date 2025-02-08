@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import store, { RootState } from "../../../../store";
+import { RootState } from "../../../../store";
 import { useParams } from "react-router-dom";
 import dayjs from "dayjs";
-import { transformInstallmentTypePayload } from "../../../../util/actions/transformInstallmentFormPayload";
 import { DatePicker } from "antd";
 import { FaCheck } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
 import { MdDelete, MdModeEditOutline } from "react-icons/md";
 import FeeDetails from "./FeeDetails";
-import { lockLeadOffer } from "../../../../store/offer-details/lead-offer-lock-slice";
 
 type Installment = {
   id: number;
@@ -21,7 +19,6 @@ const InstallmentAndOfferAnalysis: React.FC = () => {
 
 
   const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   const netFee = FeeCalculationByProgramIdResponse?.courseFeeAfterDiscount;
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
@@ -31,7 +28,6 @@ const InstallmentAndOfferAnalysis: React.FC = () => {
   const [tempDate, setTempDate] = useState<string | null | any>(null);
   const { leadCaptureId } = useParams();
   const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === false;
-  const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
 
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
@@ -180,7 +176,7 @@ const InstallmentAndOfferAnalysis: React.FC = () => {
       installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
     }));
 
-    const finalInstallmentPayload = transformInstallmentTypePayload(FeeCalculationByProgramIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
+    // const finalInstallmentPayload = transformInstallmentTypePayload(FeeCalculationByProgramIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
 
     // Validate the payload
     const errors = validateInstallmentPayload(leadFeeInstallmentDetails);
@@ -189,8 +185,8 @@ const InstallmentAndOfferAnalysis: React.FC = () => {
       return;
     }
     setValidationErrors([]); // Clear errors if no validation issues
-    console.log("finalInstallmentPayload==================", finalInstallmentPayload);
-    store.dispatch(lockLeadOffer(finalInstallmentPayload));
+    // console.log("finalInstallmentPayload==================", finalInstallmentPayload);
+    // store.dispatch(lockLeadOffer(finalInstallmentPayload));
     // console.log(payload); // This is where you'd send the payload, e.g., an API call
     // store.dispatch(onGetLockAndOfferPayload(finalInstallmentPayload));
   };

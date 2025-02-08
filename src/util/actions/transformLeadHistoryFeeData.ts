@@ -28,6 +28,11 @@ export function transformLeadHistoryFeeData(response: any) {
     {
       id: 6,
       title: "Additional Discount",
+      value: response.additionalDiscount === null ? 0 : response.additionalDiscount,
+    },
+    {
+      id: 6,
+      title: "Special Discount",
       value: response.specialDiscount,
     },
 

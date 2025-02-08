@@ -120,6 +120,16 @@ import { createLeadEnquirySliceReducer } from "../lead-attribute-update/create-l
 import { getAdditionalInfoByIdReducer } from "../lead-attribute-update/get-leadAdditionalDetails-slice";
 import { updateLeadAdditionalInfoReducer } from "../lead-attribute-update/update-leadAdditionalDetails-slice";
 import { AddAdditionalDetailsReducer } from "../lead-attribute-update/create-leadAdditionalDetails-slice";
+import { getAllActiveScholarCategoryReducer } from "../scholarship-get/get-all-scholarship-category-slice";
+import { getScholarshipSchemeByCategIdReducer } from "../scholarship-get/get-all-scholarshipScheme-by-categoryId-slice";
+import { getScholarshipSlabBySchemeIdReducer } from "../scholarship-get/get-all-scholarshipSlab-by-schemeId-slice";
+import { getScholarshipPercentageDiscountBySlabIdReducer } from "../scholarship-get/get-scholarshipPercentageDiscount-by-slabId-slice";
+import { getFeeDetailsV2Reducer } from "../leadFeeDetailsV2/get-lead-feeDetailsV2-slice";
+import { getAllDiscountReasonReducer } from "../scholarship-get/get-all-discountReason-slice";
+import { getAllActiveScholarshipOptionReducer } from "../scholarship-get/get-all-scholarshipData-slice";
+import { exportLeadReducer } from "../actions/export-lead-slice";
+import { BulkChangeStageReducer } from "../actions/bulk-change-stage-slice";
+import leadReportSlice from "../home/get-followUp-details-slice"
 
 const RootReducer = {
   auth: authReducer,
@@ -281,6 +291,24 @@ const RootReducer = {
   getAdditionalInfoByIdData: getAdditionalInfoByIdReducer,
   LeadAdditionalInfoUpdate: updateLeadAdditionalInfoReducer,
   addAdditionalDetails: AddAdditionalDetailsReducer,
+
+  //**************Scholarship Get************************************ */
+  getAllActiveScholarCategory: getAllActiveScholarCategoryReducer,
+  getAllScholarshipSchemeByCategoryId: getScholarshipSchemeByCategIdReducer,
+  getAllScholarshipSlabBySchemeId: getScholarshipSlabBySchemeIdReducer,
+  getScholarshipPercentageDiscountBySlabId: getScholarshipPercentageDiscountBySlabIdReducer,
+  getAllDiscountReason: getAllDiscountReasonReducer,
+  getAllScholarshipOption: getAllActiveScholarshipOptionReducer,
+
+  // ***************Fee Details V2 ****************************
+  getFeeDetailsV2: getFeeDetailsV2Reducer,
+
+  // *******************Export lead ********************
+  ExportLead: exportLeadReducer,
+  BulkChangeStage: BulkChangeStageReducer,
+
+  // **********************Home**********************
+  getFollowUpDetails: leadReportSlice,
 };
 
 export default RootReducer;

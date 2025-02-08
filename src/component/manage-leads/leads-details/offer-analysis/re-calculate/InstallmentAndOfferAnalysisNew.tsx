@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DatePicker } from "antd";
 import dayjs from "dayjs"; // Use dayjs for date manipulation
 import FeeDetails from "../FeeDetails";
@@ -30,6 +30,7 @@ const validateInstallmentPayload = (payload: any) => {
 };
 
 const InstallmentAndOfferAnalysisNew: React.FC = () => {
+  console.log("component called");
   const { leadCaptureId } = useParams();
   const dispatch = store.dispatch;
 
@@ -38,17 +39,54 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
   const [tempAmount, setTempAmount] = useState<number | null>(null);
   const [tempDate, setTempDate] = useState<string | null | any>(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
+  const [numberOfInstallment, setNumberOfInstallment] = useState<number>(0);
+  console.log(numberOfInstallment);
 
-  const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
+  // const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
+  const { FeeDetailsV2Response } = useSelector((state: RootState) => state.getFeeDetailsV2);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
-  const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === true;
-  const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
-  const netFee = FeeCalculationByProgramIdResponse?.courseFeeAfterDiscount;
+  // const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
+  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
+  const { leadOfferHistoryByOfferIdResponse } = useSelector((state: RootState) => state.leadOfferHistoryByOfferId);
+  const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === true && leadOfferHistoryByOfferIdResponse.status !== "validated" && numberOfInstallment !== 0;
+  // const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
+  const netFee = FeeDetailsV2Response?.courseFeeAfterDiscount;
+
+  const { scholarshipData } = useSelector((state: RootState) => state.ui);
+  const leadScholarshipDetailsId = "";
+
+  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
+  const leadEnquiryId = activeEnquiry.length > 0 ? activeEnquiry[0].leadEnquiryId : null;
 
   const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee }]);
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (numberOfInstallment > 0 && netFee > 0) {
+      const today = new Date();
+
+      const newInstallments = Array.from({ length: numberOfInstallment }, (_, index) => {
+        const dueDate = new Date(today);
+        dueDate.setDate(today.getDate() + (15 + index * 30)); // First installment in 15 days, next every 30 days
+
+        return {
+          id: index + 1,
+          dueDate: dueDate.toISOString().split("T")[0], // Format as 'YYYY-MM-DD'
+          amount: Math.floor(netFee / numberOfInstallment), // Evenly split
+        };
+      });
+
+      // Adjust the last installment to account for any rounding differences
+      const totalAssigned = newInstallments.reduce((sum, inst) => sum + inst.amount, 0);
+      const remainingAmount = netFee - totalAssigned;
+      newInstallments[newInstallments.length - 1].amount += remainingAmount;
+
+      setInstallments(newInstallments);
+    } else {
+      setInstallments([]); // Reset if numberOfInstallments is 0
+    }
+  }, [numberOfInstallment, netFee]);
 
   // Function to disable dates: previous dates and any previously selected dates
   const disabledDate = (current: any) => {
@@ -205,7 +243,14 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
       installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
     }));
 
-    const finalInstallmentPayload = transformInstallmentTypePayload(FeeCalculationByProgramIdResponse, leadFeeInstallmentDetails, leadCaptureId, leadScholarshipDetailsId);
+    const finalInstallmentPayload = transformInstallmentTypePayload(
+      FeeDetailsV2Response,
+      leadFeeInstallmentDetails,
+      leadCaptureId,
+      leadEnquiryId,
+      scholarshipData,
+      leadScholarshipDetailsId
+    );
 
     // Validate the payload
     const errors = validateInstallmentPayload(leadFeeInstallmentDetails);
@@ -230,95 +275,112 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
         <FeeDetails />
         <div className="w-full mt-5 lg:mt-0 ">
           <h2 className="text-[20px] font-semibold text-[#3b82f6] mb-2">Installment Details</h2>
-          <div className="border h-[calc(100%-40px)]">
-            <div className="w-full px-3 py-3">
-              <div className="w-full overflow-x-auto ">
-                <table className="text-sm " border={1} style={{ width: "100%", textAlign: "left" }}>
-                  <thead>
-                    <tr className="w-full">
-                      <th className="w-[25%] min-w-[135px]   border px-1 py-1.5 text-nowrap">Installment Number</th>
-                      <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Due Date</th>
-                      <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
-                      <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {installments.map((installment, index) => {
-                      console.log("installment.dueDate= ", installment.dueDate);
-                      return (
-                        <tr key={installment.id}>
-                          <td className="px-1 py-1 text-nowrap border h-[29px]">{installment.id}</td>
-                          <td className="px-1 py-1 text-nowrap border h-[29px]">
-                            {installment.dueDate === "" ? (
-                              <DatePicker
-                                value={tempDate ? dayjs(tempDate) : null}
-                                onChange={(_, dateString) => setTempDate(dateString)}
-                                disabledDate={disabledDate}
-                                disabled={editingId !== installment.id}
-                                style={{ width: 180 }}
-                                placeholder="Select date"
-                                className="border-remove-date-picker"
-                              />
-                            ) : (
-                              installment.dueDate
-                            )}
-                          </td>
-                          <td className="px-1 py-1 text-nowrap border h-[29px]">
-                            {editingId === installment.id ? (
-                              <input
-                                type="text"
-                                className="w-full max-w-[95%] focus:outline-none"
-                                value={tempAmount || ""}
-                                onChange={(e) => setTempAmount(parseInt(e.target.value) || 0)}
-                              />
-                            ) : (
-                              installment.amount
-                            )}
-                          </td>
-                          <td className="px-1 py-1 text-nowrap border h-[29px]">
-                            {editingId === installment.id ? (
-                              <>
-                                <button
-                                  onClick={handleOk}
-                                  disabled={!tempAmount || !tempDate}
-                                  className={`px-2 py-0.5    ${!tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"}`}
-                                >
-                                  <FaCheck size={18} />
-                                </button>
-                                <button className="px-2 py-0.5    text-red-500 border-red-500" onClick={handleCancel}>
-                                  {" "}
-                                  <RxCross2 size={18} />
-                                </button>
-                              </>
-                            ) : index === installments.length - 1 ? (
-                              <>
-                                <button className="px-2 py-0.5    text-blue-500 border-blue-500" onClick={() => handleEditClick(installment.id)}>
-                                  <MdModeEditOutline size={18} />
-                                </button>
-                                {index !== 0 && (
-                                  <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
-                                    <MdDelete size={18} />
-                                  </button>
-                                )}
-                              </>
-                            ) : null}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+
+          {/* checkbox to select installment */}
+
+          <div className="flex justify-evenly items-center">
+            <div className="flex gap-2">
+              <input type="radio" name="numberOfInstallment" value={3} onChange={(e: any) => setNumberOfInstallment(e.target.value)} />
+              <label htmlFor="numberOfInstallment">3 Installments </label>
             </div>
-            {/* Error Messages */}
-            {validationErrors.length > 0 && (
-              <ul className=" text-red-600  px-3 pb-2">
-                {validationErrors.map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-              </ul>
-            )}
+            <div className="flex gap-2">
+              <input type="radio" name="numberOfInstallment" value={4} onChange={(e: any) => setNumberOfInstallment(e.target.value)} />
+              <label htmlFor="numberOfInstallment">4 Installments </label>
+            </div>
           </div>
+          {numberOfInstallment !== 0 && (
+            <div className="border h-[calc(100%-40px)]">
+              <div className="w-full px-3 py-3">
+                <div className="w-full overflow-x-auto ">
+                  <table className="text-sm " border={1} style={{ width: "100%", textAlign: "left" }}>
+                    <thead>
+                      <tr className="w-full">
+                        <th className="w-[25%] min-w-[135px]   border px-1 py-1.5 text-nowrap">Installment Number</th>
+                        <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Due Date</th>
+                        <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Amount(Rs)</th>
+                        <th className="w-[25%] min-w-[135px]    border px-1 py-1.5 text-nowrap">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {installments.map((installment, index) => {
+                        console.log("installment.dueDate= ", installment.dueDate);
+                        return (
+                          <tr key={installment.id}>
+                            <td className="px-1 py-1 text-nowrap border h-[29px]">{installment.id}</td>
+                            <td className="px-1 py-1 text-nowrap border h-[29px]">
+                              {installment.dueDate === "" ? (
+                                <DatePicker
+                                  value={tempDate ? dayjs(tempDate) : null}
+                                  onChange={(_, dateString) => setTempDate(dateString)}
+                                  disabledDate={disabledDate}
+                                  disabled={editingId !== installment.id}
+                                  style={{ width: 180 }}
+                                  placeholder="Select date"
+                                  className="border-remove-date-picker"
+                                />
+                              ) : (
+                                installment.dueDate
+                              )}
+                            </td>
+                            <td className="px-1 py-1 text-nowrap border h-[29px]">
+                              {editingId === installment.id ? (
+                                <input
+                                  type="text"
+                                  className="w-full max-w-[95%] focus:outline-none"
+                                  value={tempAmount || ""}
+                                  onChange={(e) => setTempAmount(parseInt(e.target.value) || 0)}
+                                />
+                              ) : (
+                                installment.amount
+                              )}
+                            </td>
+                            <td className="px-1 py-1 text-nowrap border h-[29px]">
+                              {editingId === installment.id ? (
+                                <>
+                                  <button
+                                    onClick={handleOk}
+                                    disabled={!tempAmount || !tempDate}
+                                    className={`px-2 py-0.5    ${
+                                      !tempAmount || !tempDate ? "cursor-not-allowed text-gray-600 border-gray-600" : "text-green-600 border-green-600"
+                                    }`}
+                                  >
+                                    <FaCheck size={18} />
+                                  </button>
+                                  <button className="px-2 py-0.5    text-red-500 border-red-500" onClick={handleCancel}>
+                                    {" "}
+                                    <RxCross2 size={18} />
+                                  </button>
+                                </>
+                              ) : index === installments.length - 1 ? (
+                                <>
+                                  <button className="px-2 py-0.5    text-blue-500 border-blue-500" onClick={() => handleEditClick(installment.id)}>
+                                    <MdModeEditOutline size={18} />
+                                  </button>
+                                  {index !== 0 && (
+                                    <button className="px-2 py-0.5   text-red-500 border-red-500" onClick={() => handleDelete(installment.id)}>
+                                      <MdDelete size={18} />
+                                    </button>
+                                  )}
+                                </>
+                              ) : null}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              {/* Error Messages */}
+              {validationErrors.length > 0 && (
+                <ul className=" text-red-600  px-3 pb-2">
+                  {validationErrors.map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

@@ -6,8 +6,8 @@ import { redirectToLogin, setAuth } from "../store/auth/auth-Slice";
 // Create an Axios instance
 const coreLeadCaptureApi = axios.create({
   //prod
-  // baseURL: "http://192.200.12.174:7075",
-  baseURL: "http://10.8.20.38:7075",
+  baseURL: "http://192.200.12.174:7075",
+  // baseURL: "http://10.8.20.38:7075",
 
   timeout: 50000,
 });
@@ -66,13 +66,13 @@ async function refreshAccessToken(refreshToken: string): Promise<string | null> 
     params.append("refresh_token", refreshToken);
 
     // prod
-    // const response = await axios.post("http://192.200.12.174:9001/oauth2/token", params.toString(), {
-    const response = await axios.post("http://10.8.20.38:9001/oauth2/token", params.toString(), {
+    const response = await axios.post("http://192.200.12.174:9001/oauth2/token", params.toString(), {
+    // const response = await axios.post("http://10.8.20.38:9001/oauth2/token", params.toString(), {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
         //prod
-        // Authorization: "Basic " + btoa("unifcrmsales:secret"),
-        Authorization: "Basic " + btoa(":secret"),
+        Authorization: "Basic " + btoa("unifcrmsales:secret"),
+        // Authorization: "Basic " + btoa(":secret"),
       },
     });
     // console.log("response= ", response);
