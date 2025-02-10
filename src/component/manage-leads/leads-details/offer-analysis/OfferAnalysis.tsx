@@ -50,7 +50,6 @@ const OfferAnalysis: React.FC<OfferAnalysisProps> = ({ ongetLeadOfferHistory, is
   const { isLoading: IsLoadingForFeeDetailsV2, FeeDetailsV2Response } = useSelector((state: RootState) => state.getFeeDetailsV2);
   const { isLoading: isLoadingForLeadScholarship } = useSelector((state: RootState) => state.getAllScholarshipOption);
 
-
   // console.log("leadOfferHistoryByOfferIdResponse========", leadOfferHistoryByOfferIdResponse);
   // console.log("isEnablePackageDeal", isEnablePackageDeal);
   // Transform lead details data for preview
@@ -74,7 +73,6 @@ const OfferAnalysis: React.FC<OfferAnalysisProps> = ({ ongetLeadOfferHistory, is
       value: findleadScholarDetailsData.applicableOn === "Y" ? "Yearly Tution Fee" : "Semester Tution Fee",
     },
   ];
-
 
   useEffect(() => {
     store.dispatch(getAllDiscountReason());

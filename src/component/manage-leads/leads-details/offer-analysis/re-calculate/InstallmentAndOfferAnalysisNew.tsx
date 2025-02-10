@@ -15,6 +15,7 @@ type Installment = {
   id: number;
   dueDate: string;
   amount: number;
+  leadEnquiryId: number | string;
 };
 const validateInstallmentPayload = (payload: any) => {
   const errors: string[] = [];
@@ -60,7 +61,7 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
   const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
   const leadEnquiryId = activeEnquiry.length > 0 ? activeEnquiry[0].leadEnquiryId : null;
 
-  const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee }]);
+  const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee, leadEnquiryId:leadEnquiryId  }]);
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
 
@@ -76,6 +77,7 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
           id: index + 1,
           dueDate: dueDate.toISOString().split("T")[0], // Format as 'YYYY-MM-DD'
           amount: Math.floor(netFee / numberOfInstallment), // Evenly split
+          leadEnquiryId:leadEnquiryId
         };
       });
 
@@ -158,6 +160,7 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
           id: nextId,
           dueDate: "",
           amount: newInstallmentAmount,
+          leadEnquiryId:leadEnquiryId
         });
         nextId++;
         remainingAmount -= newInstallmentAmount;
@@ -205,6 +208,7 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
         id: updatedInstallments.length + 1,
         dueDate: "",
         amount: remainingAmount,
+        leadEnquiryId:leadEnquiryId
       });
     }
 
@@ -242,7 +246,8 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
       leadCaptureId: leadCaptureId,
       installmentSeq: index + 1, // Sequence number for installments
       installmentDueDate: installment.dueDate,
-      installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
+      installmentAmount: parseFloat(installment.amount.toFixed(2)),
+      leadEnquiryId:leadEnquiryId // Ensuring it's in decimal format
     }));
 
     const finalInstallmentPayload = transformInstallmentTypePayload(

@@ -15,7 +15,6 @@ import { getLeadScheduledNotesValuesById } from "../../store/notes/get-leadSched
 import { getAttachmentTypeValues } from "../../store/notes/get-all-coreDocAttachmentType-slice";
 import ManageLeadsDetails from "../../component/manage-leads/leads-details/ManageLeadsDetails";
 import { getLeadScheduledTaskValues } from "../../store/task/get-allLeadscheduledTask";
-import { getMaxLeadScholarshipDetailsById } from "../../store/scholarship-services/get-max-lead-scholarship-details-by-leadCapture-id-slice";
 import { findLeadScholarshipDetailsById } from "../../store/scholarship-services/find-lead-scholarship-details-by-lead-id-slice";
 import { getLeadApplicationStatusByLeadId } from "../../store/lead-applicationStatus/get-lead-application-status-by-lead-capture-id-slice";
 import { getMaxActiveAppStatus } from "../../store/scholarship-services/get-max-active-application-status-slice";
@@ -70,7 +69,7 @@ const ViewManageLeadsPage: React.FC = () => {
       dispatch(getAttachmentTypeValues());
       dispatch(getLeadPropertiesById(leadCaptureId));
       dispatch(getMaxActiveAppStatus(leadCaptureId));
-      dispatch(getMaxLeadScholarshipDetailsById(leadCaptureId));
+      // dispatch(getMaxLeadScholarshipDetailsById(leadCaptureId));
     }
   }, [leadCaptureId, dispatch]);
 

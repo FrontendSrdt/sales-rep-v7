@@ -15,6 +15,7 @@ type Installment = {
   id: number;
   dueDate: string;
   amount: number;
+  leadEnquiryId: number | string;
 };
 const validateInstallmentPayload = (payload: any) => {
   const errors: string[] = [];
@@ -32,17 +33,17 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
   const { leadOfferHistoryByOfferIdResponse } = useSelector((state: RootState) => state.leadOfferHistoryByOfferId);
   const { responseForAllScholarshipOptions } = useSelector((state: RootState) => state.getAllScholarshipOption);
   const netFee = leadOfferHistoryByOfferIdResponse?.netFee;
+  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
+  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
+  const leadEnquiryId = activeEnquiry.length > 0 ? activeEnquiry[0].leadEnquiryId : null;
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
-  const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee }]);
+  const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee, leadEnquiryId: leadEnquiryId }]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [tempAmount, setTempAmount] = useState<number | null>(null);
   const [tempDate, setTempDate] = useState<string | null | any>(null);
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const { leadCaptureId } = useParams();
-  const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
   const [numberOfInstallment, setNumberOfInstallment] = useState<number>(0);
-  const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
-  const leadEnquiryId = activeEnquiry.length > 0 ? activeEnquiry[0].leadEnquiryId : null;
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
 
   console.log("leadOfferHistoryByOfferIdResponse.status", leadOfferHistoryByOfferIdResponse.status);
@@ -59,6 +60,7 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
           id: index + 1,
           dueDate: dueDate.toISOString().split("T")[0], // Format as 'YYYY-MM-DD'
           amount: Math.floor(netFee / numberOfInstallment), // Evenly split
+          leadEnquiryId: leadEnquiryId,
         };
       });
 
@@ -141,6 +143,7 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
           id: nextId,
           dueDate: "",
           amount: newInstallmentAmount,
+          leadEnquiryId: leadEnquiryId,
         });
         nextId++;
         remainingAmount -= newInstallmentAmount;
@@ -181,6 +184,7 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
         id: updatedInstallments.length + 1,
         dueDate: "",
         amount: remainingAmount,
+        leadEnquiryId: leadEnquiryId,
       });
     }
 
@@ -194,6 +198,7 @@ const HistoryInstallmentAndOfferAnalysis: React.FC = () => {
       installmentSeq: index + 1, // Sequence number for installments
       installmentDueDate: installment.dueDate,
       installmentAmount: parseFloat(installment.amount.toFixed(2)), // Ensuring it's in decimal format
+      leadEnquiryId: leadEnquiryId,
     }));
 
     const finalInstallmentPayload = transformHistoryInstallmentTypePayload(
