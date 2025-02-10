@@ -13,7 +13,7 @@ import useClickOutside from "../../../../hooks/useClickOutside";
 import { Link } from "react-router-dom";
 import QuickAddLeadForm from "../../genral/QuickAddLeadForm";
 import CustomModal from "../../../../util/custom/ui/CustomModal";
-import { quickAddLeadFormData, testActionData } from "../../../../data/manage-leads/quick-add-form-data";
+import { quickAddLeadFormData } from "../../../../data/manage-leads/quick-add-form-data";
 import { Tooltip } from "react-tooltip";
 import { resetResposneforLeadCaptureByQuickAddForm } from "../../../../store/lead-capture/create-lead-capture-byQuickAddForm-slice";
 import BulkChangeOwner from "../../genral/BulkChangeOwner";
