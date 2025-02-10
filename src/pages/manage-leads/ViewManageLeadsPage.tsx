@@ -82,9 +82,13 @@ const ViewManageLeadsPage: React.FC = () => {
         leadCaptureId: leadCaptureId,
         leadEnquiryId: leadEnquiryId,
       };
+      const payloadForApplicationStatus = {
+        leadCaptureId: leadCaptureId,
+        leadEnquiryId: leadEnquiryId,
+      };
       dispatch(findLeadScholarshipDetailsById(payloadForScholarship));
+      dispatch(getLeadApplicationStatusByLeadId(payloadForApplicationStatus));
     }
-    dispatch(getLeadApplicationStatusByLeadId(leadCaptureId));
   }, [leadCaptureId, isRunForLeadOfferLock, isRunForAllDocsConfirmation, responseOfLeadEnquiryDetailsById]);
 
   useEffect(() => {

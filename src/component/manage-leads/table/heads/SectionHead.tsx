@@ -21,6 +21,7 @@ import { exportLead } from "../../../../store/actions/export-lead-slice";
 import toast from "react-hot-toast";
 import { changeStageData } from "../../../../data/change-stage-data";
 import ChangeStage from "../../genral/ChangeStage";
+import { bulkChangeOwnerData } from "../../../../data/bulk-changeOwner-data";
 
 interface SectionHeadPropsType {
   sectionHeadData: any;
@@ -244,7 +245,7 @@ const SectionHead: React.FC<SectionHeadPropsType> = ({ sectionHeadData }) => {
       )}
 
       {isShowModalForTestAction && (
-        <CustomModal isMode="testAction" isShowModal={isShowModalForTestAction} onHideModal={closeModalForTestAction} data={testActionData}>
+        <CustomModal isMode="testAction" isShowModal={isShowModalForTestAction} onHideModal={closeModalForTestAction} data={bulkChangeOwnerData}>
           <BulkChangeOwner onHideModal={closeModalForTestAction} />
         </CustomModal>
       )}

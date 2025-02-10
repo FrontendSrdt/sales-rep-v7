@@ -29,7 +29,7 @@ export const ChangeStageInBulk = createAsyncThunk<any | BulkChangeStage, any>(
 
     toast.promise(response, {
       loading: "Loading",
-      success: "Owner Changed successfully",
+      success: "Stage Changed successfully",
       error: (e: any) => {
         // Extract the error message dynamically from response
         const errorMessage = e.response?.data?.error || "Error occurred while submitting";

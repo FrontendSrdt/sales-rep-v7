@@ -4,7 +4,7 @@ import { PiPhoneCallFill } from "react-icons/pi";
 import { MdMessage } from "react-icons/md";
 import { GrNotes } from "react-icons/gr";
 import { BiTask } from "react-icons/bi";
-import { TbUserEdit } from "react-icons/tb";
+import { TbMessages, TbUserEdit } from "react-icons/tb";
 import detailsIcon from "../../../../../assets/activity-history-icons/basic-detail.png";
 import contractIcon from "../../../../../assets/activity-history-icons/contract.png";
 import documentUploadIcon from "../../../../../assets/activity-history-icons/document-upload.png";
@@ -36,6 +36,7 @@ export const renderIcon = (iconName: string) => {
     DocumentsUpload: <img src={documentUploadIcon} alt="documents-upload-icon" className="w-8 h-8 object-contain white-filter" />,
     DocumentsReview: <img src={documentReviewIcon} alt="documents-review-icon" className=" ml-[2px] p-[1px] w-6 h-7 object-contain white-filter" />,
     PayCourseFee: <img src={feeIcon} alt="pay-course-fee-icon" className="w-8 h-8 object-contain white-filter" />,
+    TbMessages: <TbMessages />,
     // Add more icon mappings as needed
   };
 

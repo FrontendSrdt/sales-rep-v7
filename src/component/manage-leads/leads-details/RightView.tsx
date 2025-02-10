@@ -33,7 +33,7 @@ const RightView: React.FC = () => {
     // console.log("inside effect");
     // console.log("findLeadScholarshipDetailsResponse= ", findLeadScholarshipDetailsResponse)
     // console.log("leadApplicationStatusByLeadId?.[4]?.status= ", leadApplicationStatusByLeadId?.[4]?.status)
-    const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true && findLeadScholarshipDetailsResponse.status !== "validated";
+    const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true;
     setDisplayOfferAnalysis(shouldDisplayOfferAnalysis);
 
     // if (!shouldDisplayOfferAnalysis) {

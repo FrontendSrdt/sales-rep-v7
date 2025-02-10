@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import store, { RootState } from "../../../../store";
- 
+
 import { useSelector } from "react-redux";
 import LoadingSpinner from "../../../../util/custom/ui/LoadingSpinner";
 import { academicDetailsFormInput, getInitialValuesForAcademicDetails, getValidationSchemaForAcademicDeatils } from "../../../../data/lead-details-data-new/leadAcademic-data";
@@ -14,54 +14,55 @@ import {
   updateLeadAcademicDetails,
 } from "../../../../store/lead-attribute-update/update-leadAcademicDetails-slice";
 import { MdOutlineEdit } from "react-icons/md";
- 
+
 const AcademicInfo: React.FC = () => {
   const { leadCaptureId } = useParams();
   const { isLoading, responseOfLeadAcademicDetailsById } = useSelector((state: RootState) => state.getLeadAcademicDetailsDataById);
   const { responseofLeadBiographicalInfo } = useSelector((state: RootState) => state.getBiographicalInfoByIdData);
- 
+
   const { isEnableForDiplomaInputFields, isEnableForTwelfthInputFields, isEnableForUGInputFields } = useSelector((state: RootState) => state.ui as any);
- 
+  console.log(isEnableForDiplomaInputFields, isEnableForTwelfthInputFields, isEnableForUGInputFields);
+
   const { isError, resetActions, responseOfLeadAcademicDetails } = useSelector((state: RootState) => state.LeadAcademicDetailsUpdate);
   const [isEditing, setEditing] = useState(false);
- 
+
   const onUpdateLeadHandler = (data: any) => {
     const updatedData = transformPayloadForAcademicData(data.values, isEnableForTwelfthInputFields, isEnableForDiplomaInputFields, leadCaptureId);
     store.dispatch(updateLeadAcademicDetails(updatedData));
     store.dispatch(takeActionsForUpdateLeadAcademicDetails(data.actions));
   };
- 
+
   const initialValuesForAcademicInfo = responseOfLeadAcademicDetailsById !== null ? getInitialValuesForAcademicDetails(responseOfLeadAcademicDetailsById) : null;
- 
+
   const Tenth_plus_2_type = initialValuesForAcademicInfo?.tenth_plus_2_type;
   const careerId = responseofLeadBiographicalInfo.careerId;
- 
+
   useEffect(() => {
     if (Tenth_plus_2_type === "TWELFTH") {
       store.dispatch(onSetEnableForTwefthInputFields());
     }
- 
+
     if (Tenth_plus_2_type === "DIPLOMA") {
       store.dispatch(onSetEnableForDiplomaInputFields());
     }
- 
+
     if (careerId == "46") {
       store.dispatch(onSetEnableForUGInputFields());
     }
   }, [initialValuesForAcademicInfo?.tenth_plus_2_type, responseofLeadBiographicalInfo.careerId]);
- 
+
   useEffect(() => {
     if (!isError && responseOfLeadAcademicDetails) {
-      setEditing(false)
+      setEditing(false);
       resetActions.resetForm();
       store.dispatch(resetResponseForUpdateLeadAcademicDetails());
     }
   }, [responseOfLeadAcademicDetails]);
- 
+
   const handleEditClick = () => {
     setEditing(true);
   };
- 
+
   return (
     <>
       {isLoading && <LoadingSpinner size={20} mainLoading={false} message="Loading Details" centered={false} />}
@@ -97,5 +98,5 @@ const AcademicInfo: React.FC = () => {
     // <div>hello</div>
   );
 };
- 
+
 export default AcademicInfo;

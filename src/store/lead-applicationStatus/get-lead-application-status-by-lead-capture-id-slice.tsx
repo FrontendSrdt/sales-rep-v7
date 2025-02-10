@@ -12,9 +12,9 @@ const initialState: LeadApplicationStatusLeadIdType = {
   isLoading: true,
   isError: null,
 };
-export const getLeadApplicationStatusByLeadId = createAsyncThunk<any, any>("leadApplicationStatusLeadId", async (leadCaptureId, { rejectWithValue }) => {
+export const getLeadApplicationStatusByLeadId = createAsyncThunk<any, any>("leadApplicationStatusLeadId", async ({ leadCaptureId, leadEnquiryId }, { rejectWithValue }) => {
   try {
-    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadapplicationstatus/getLeadApplicationStatus/${leadCaptureId}`);
+    const response = await coreLeadCaptureApi.get(`api/crm/lead/leadapplicationstatus/getLeadApplicationStatus/${leadCaptureId}/${leadEnquiryId}`);
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.response?.data.message || "An error occurred.");

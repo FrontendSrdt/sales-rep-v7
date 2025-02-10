@@ -20,7 +20,6 @@ const OfferAnalysisPage: React.FC = () => {
   const { getOfferAndInstallmentPayload: lockLeadOfferData } = useSelector((state: RootState) => state.ui);
   const { isLoading } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
   const activeEnquiry = Array.isArray(responseOfLeadEnquiryDetailsById) ? responseOfLeadEnquiryDetailsById.filter((item: any) => item.status === "ACTIVE") : [];
   const leadEnquiryId = activeEnquiry[0].leadEnquiryId;
@@ -37,7 +36,7 @@ const OfferAnalysisPage: React.FC = () => {
 
   useEffect(() => {
     console.log("inside effect");
-    const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true && findLeadScholarshipDetailsResponse.status !== "validated";
+    const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true;
     setDisplayOfferAnalysis(shouldDisplayOfferAnalysis);
   }, [leadApplicationStatusByLeadId]);
 
