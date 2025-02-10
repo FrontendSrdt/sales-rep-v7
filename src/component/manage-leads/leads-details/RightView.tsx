@@ -24,22 +24,24 @@ const RightView: React.FC = () => {
   const { isLoading: isLoadingForTask } = useSelector((state: RootState) => state.getLeadScheduleTaskDataById);
   const { isLoading: isLoadingForNotes } = useSelector((state: RootState) => state.getLeadScheduledNotes);
   const { isLoading: isLoadingForDocs } = useSelector((state: RootState) => state.getDocumentsDataById);
-  const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
-  const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
+  const { isLoading, leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
+  // const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
 
   const [displayOfferAnalysis, setDisplayOfferAnalysis] = useState(false);
 
   useEffect(() => {
-    // console.log("inside effect");
-    // console.log("findLeadScholarshipDetailsResponse= ", findLeadScholarshipDetailsResponse)
-    // console.log("leadApplicationStatusByLeadId?.[4]?.status= ", leadApplicationStatusByLeadId?.[4]?.status)
-    const shouldDisplayOfferAnalysis = leadApplicationStatusByLeadId?.[3]?.status === true;
+    console.log("leadApplicationStatusByLeadId", leadApplicationStatusByLeadId);
+    const registrationFeeObject = !isLoading && leadApplicationStatusByLeadId.length !== 0 && leadApplicationStatusByLeadId.find((item: any) => item.name === "Registration Fee");
+
+    console.log(registrationFeeObject);
+
+    const shouldDisplayOfferAnalysis = registrationFeeObject.status === true;
     setDisplayOfferAnalysis(shouldDisplayOfferAnalysis);
 
     // if (!shouldDisplayOfferAnalysis) {
     //   setActiveTab(0);
     // }
-  }, [leadApplicationStatusByLeadId, findLeadScholarshipDetailsResponse.status]);
+  }, [leadApplicationStatusByLeadId]);
 
   const programId = leadAdditionalDetailsDataById?.academicProgramId;
   const leadCaptureId = leadAdditionalDetailsDataById.leadCaptureId;

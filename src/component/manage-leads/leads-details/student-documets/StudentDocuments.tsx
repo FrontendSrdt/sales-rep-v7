@@ -15,7 +15,8 @@ const StudentDocuments: React.FC = () => {
   const { isLoading, StudentDocsByLeadCaptureIdResponse } = useSelector((state: RootState) => state.getStudentDocsByLeadCaptureIdResponse);
   const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
 
-  const isAllDocsVerified = leadApplicationStatusByLeadId[9]?.status; // Added optional chaining to prevent runtime errors
+  const DocumentReviewObject = !isLoading && leadApplicationStatusByLeadId.length !== 0 && leadApplicationStatusByLeadId.find((item: any) => item.name === "Document Review");
+  const isAllDocsVerified = DocumentReviewObject.status; // Added optional chaining to prevent runtime errors
   const { leadCaptureId } = useParams();
 
   const handleSubmit = (values: any, { resetForm }: { resetForm: () => void }) => {
@@ -49,13 +50,9 @@ const StudentDocuments: React.FC = () => {
                       <div className="mb-4">
                         <label className="inline-flex items-center">
                           <Field type="checkbox" name="acknowledgment" className="form-checkbox text-blue-600 rounded focus:ring-blue-500" />
-                          <span className="ml-2 text-gray-700">
-                            By clicking the checkbox, you agree that you have carefully and thoroughly examined the uploaded documents.
-                          </span>
+                          <span className="ml-2 text-gray-700">By clicking the checkbox, you agree that you have carefully and thoroughly examined the uploaded documents.</span>
                         </label>
-                        {errors.acknowledgment && touched.acknowledgment && (
-                          <p className="text-red-500 text-sm mt-1">{errors.acknowledgment}</p>
-                        )}
+                        {errors.acknowledgment && touched.acknowledgment && <p className="text-red-500 text-sm mt-1">{errors.acknowledgment}</p>}
                       </div>
                       <button
                         type="submit"

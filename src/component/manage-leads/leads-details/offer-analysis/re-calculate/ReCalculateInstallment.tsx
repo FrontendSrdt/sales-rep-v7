@@ -29,7 +29,7 @@ const validateInstallmentPayload = (payload: any) => {
 };
 
 const ReCalculateInstallment: React.FC = () => {
-  const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
+  const { isLoading, leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   const { packageDealByLeadCaptureIdResponse } = useSelector((state: RootState) => state.packageDealByLeadCaptureId);
   const netFee = packageDealByLeadCaptureIdResponse?.courseFeeAfterDiscount;
 
@@ -40,7 +40,9 @@ const ReCalculateInstallment: React.FC = () => {
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
   const { leadCaptureId } = useParams();
 
-  const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === false;
+  const registrationFeeObject = !isLoading && leadApplicationStatusByLeadId.length !== 0 && leadApplicationStatusByLeadId.find((item: any) => item.name === "Registration Fee");
+
+  const shouldDisplayLockButton = registrationFeeObject.status === false;
 
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);

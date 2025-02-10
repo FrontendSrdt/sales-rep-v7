@@ -14,6 +14,7 @@ const initialState: LeadApplicationStatusLeadIdType = {
 };
 export const getLeadApplicationStatusByLeadId = createAsyncThunk<any, any>("leadApplicationStatusLeadId", async ({ leadCaptureId, leadEnquiryId }, { rejectWithValue }) => {
   try {
+    console.log(leadCaptureId, leadEnquiryId);
     const response = await coreLeadCaptureApi.get(`api/crm/lead/leadapplicationstatus/getLeadApplicationStatus/${leadCaptureId}/${leadEnquiryId}`);
     return response.data;
   } catch (error: any) {

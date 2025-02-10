@@ -44,11 +44,13 @@ const InstallmentAndOfferAnalysisNew: React.FC = () => {
 
   // const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
   const { FeeDetailsV2Response } = useSelector((state: RootState) => state.getFeeDetailsV2);
-  const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
+  const { isLoading, leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   // const { findLeadScholarshipDetailsResponse } = useSelector((state: RootState) => state.findLeadScholarshipDetails);
   const { responseOfLeadEnquiryDetailsById } = useSelector((state: RootState) => state.getLeadEnquiryDetailsDataById);
   const { leadOfferHistoryByOfferIdResponse } = useSelector((state: RootState) => state.leadOfferHistoryByOfferId);
-  const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === true && leadOfferHistoryByOfferIdResponse.status !== "validated" && numberOfInstallment !== 0;
+
+  const registrationFeeObject = !isLoading && leadApplicationStatusByLeadId.length !== 0 && leadApplicationStatusByLeadId.find((item: any) => item.name === "Registration Fee");
+  const shouldDisplayLockButton = registrationFeeObject.status === true && leadOfferHistoryByOfferIdResponse.status !== "validated" && numberOfInstallment !== 0;
   // const leadScholarshipDetailsId = findLeadScholarshipDetailsResponse.leadScholarshipDetailsId;
   const netFee = FeeDetailsV2Response?.courseFeeAfterDiscount;
 

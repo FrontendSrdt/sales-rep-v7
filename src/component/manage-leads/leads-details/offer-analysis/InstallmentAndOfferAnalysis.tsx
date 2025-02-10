@@ -16,10 +16,8 @@ type Installment = {
 };
 
 const InstallmentAndOfferAnalysis: React.FC = () => {
-
-
   const { FeeCalculationByProgramIdResponse } = useSelector((state: RootState) => state.getFeeCalculationByProgramIdResponse);
-  const { leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
+  const { isLoading, leadApplicationStatusByLeadId } = useSelector((state: RootState) => state.getLeadApplicationStatusDataByLeadId);
   const netFee = FeeCalculationByProgramIdResponse?.courseFeeAfterDiscount;
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [installments, setInstallments] = useState<Installment[]>([{ id: 1, dueDate: "", amount: netFee }]);
@@ -27,7 +25,9 @@ const InstallmentAndOfferAnalysis: React.FC = () => {
   const [tempAmount, setTempAmount] = useState<number | null>(null);
   const [tempDate, setTempDate] = useState<string | null | any>(null);
   const { leadCaptureId } = useParams();
-  const shouldDisplayLockButton = leadApplicationStatusByLeadId?.[3]?.status === false;
+  const registrationFeeObject = !isLoading && leadApplicationStatusByLeadId.length !== 0 && leadApplicationStatusByLeadId.find((item: any) => item.name === "Registration Fee");
+
+  const shouldDisplayLockButton = registrationFeeObject.status === false;
 
   // Track the last selected date (for comparing the next date selection)
   const [lastSelectedDate, setLastSelectedDate] = useState<string | null>(null);
