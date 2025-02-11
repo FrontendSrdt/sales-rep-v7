@@ -25,7 +25,7 @@ export const getStudentDocsStatusType = createAsyncThunk<any, any>(
 
   async (LeadDetails, { rejectWithValue }) => {
     console.log(LeadDetails);
-    const response = coreLeadCaptureApi.get("api/crm/lead/leadOffer/getApplicationStatusByDisplayName", LeadDetails);
+    const response = coreLeadCaptureApi.post("api/crm/lead/leadOffer/getApplicationStatusByDisplayName", LeadDetails);
     console.log("tstttttt", LeadDetails);
     return response
       .then((res) => {

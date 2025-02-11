@@ -9,10 +9,10 @@ export const getValidationSchemaForScholarship = (isEnableForadditionalDiscount:
 
   if (isEnableForadditionalDiscount) {
     schema.discountReason = Yup.string().required("Please select a Discount Reason.");
-    schema.additionalDiscount = Yup.number()
-      .required("Please select an additional discount or specify 0.")
-      .max(5000, "Additional discount cannot exceed 5000")
-      .typeError("Additional discount must be a number");
+    schema.additionalDiscount= Yup.number()
+    .typeError('Additional Discount must be a number')
+    .max(5000, 'Additional Discount cannot be greater than 5000')
+    .positive('Additional Discount must be a positive number')
   }
 
   return Yup.object(schema);
